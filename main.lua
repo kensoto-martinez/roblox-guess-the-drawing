@@ -96,7 +96,7 @@ local function CreateGui()
 	--valid text label
 	local valid_text_label = Instance.new("TextLabel")
 	valid_text_label.BackgroundTransparency = 1
-	valid_text_label.Size = UDim2.fromScale(1, .05)
+	valid_text_label.Size = UDim2.new(1, 0, 0, 8)
 	valid_text_label.Font = Enum.Font.PatrickHand
 	valid_text_label.Text = "ExampleText"
 	valid_text_label.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -139,22 +139,31 @@ local function WordChanged()
 	end
 
 	--make new valid word labels
+	local valid_word_added = false
 	if list[#word_text] then --don't make new labels for n-letter words that don't have an array
 		for _, word_from_list in ipairs(list[#word_text]) do
 		    if MatchesWord(word_from_list) then
+				--add valid word label if word matches with word_text
 		        AddWordLabel(word_from_list)
+				valid_word_added = true
 		    end
 		end
+	end
+
+	--if a valid word was not found, say so
+	if not valid_word_added then
+		AddWordLabel("No valid word found in current word bank.")
 	end
 end
 
 if word then
-	--initialize gui and start sorting logic
+	--initialize gui and start word logic event
 	CreateGui()
+	WordChanged()
 	word_connection = word:GetPropertyChangedSignal("Text"):Connect(WordChanged)
 else
 	--warn player of error
-	warn("Script error: game has either patched this script or the user changed the script.")
+	warn("Script error: game has either moved the location of the revealing word in the game or you accidentally changed the 'word' variable to an invalid location.")
 end
 
 game.UserInputService.InputBegan:Connect(function(input, gp)
