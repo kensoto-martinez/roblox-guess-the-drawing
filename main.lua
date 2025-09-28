@@ -107,11 +107,44 @@ local function CreateGui()
 end
 
 local function WordChanged()
-	local word_length = #word.Text
+	local word_text = word.Text:lower()
+	local scrolling_frame = gui.GTD.Frame.Frame.ScrollingFrame
 	local list = loadstring(game:HttpGet("https://raw.githubusercontent.com/kensoto-martinez/roblox-guess-the-drawing/main/wordlist.lua"))()
 
-	for i, word in ipairs(list[5]) do
-		print(word)
+	local function MatchesWord(str: string)
+		for n = 1, #word_text do
+			--get n'th character from word_text and given string
+	        local word_char = word_text:sub(n, n)
+	        local str_char = str:sub(n, n)
+			--if word_text has an underscore, continue; if n'th character from both strings don't match, return false
+	        if word_char ~= "_" and str_char ~= word_char then
+	            return false
+	        end
+	    end
+		--return true if string and word_text match, excluding underscores
+	    return true
+	end
+
+	local function AddWordLabel(word_label_text: string)
+		local text_label = game.ReplicatedStorage.ValidWordLabel:Clone()
+		text_label.Text = word_label_text
+		text_label.Parent = scrolling_frame
+	end
+
+	--delete previous valid words
+	for _, child in pairs(scrolling_frame:GetChildren()) do
+		if child:IsA("TextLabel") then
+			child:Destroy()
+		end
+	end
+
+	--make new valid word labels
+	if list[#word_text] then --don't make new labels for n-letter words that don't have an array
+		for _, word_from_list in ipairs(list[#word_text]) do
+		    if MatchesWord(word_from_list) then
+		        AddWordLabel(word_from_list)
+		    end
+		end
 	end
 end
 
