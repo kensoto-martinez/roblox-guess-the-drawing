@@ -137,9 +137,9 @@ local function WordChanged()
 		text_label.Parent = scrolling_frame
 	end
 
-	local function CheckMatchingWordFrom(list: table)
-		if list[#word_text] then
-			for _, word_from_list in ipairs(list[#word_text]) do
+	local function CheckMatchingWordFrom(lst: table)
+		if lst[#word_text] then
+			for _, word_from_list in ipairs(lst[#word_text]) do
 				if MatchesWord(word_from_list) then
 					--add valid word label if word matches with word_text
 					AddWordLabel(word_from_list)
