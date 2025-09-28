@@ -158,8 +158,10 @@ local function WordChanged()
 			CheckMatchingWord(word_from_list)
 		end
 		--check alternate list as well
-		for _, word_from_list in ipairs(extra_words[#word_text]) do
-			CheckMatchingWord(word_from_list)
+		if extra_words[#word_text] then
+			for _, word_from_list in ipairs(extra_words[#word_text]) do
+				CheckMatchingWord(word_from_list)
+			end
 		end
 	end
 
