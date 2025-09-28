@@ -96,7 +96,7 @@ local function CreateGui()
 	--valid text label
 	local valid_text_label = Instance.new("TextLabel")
 	valid_text_label.BackgroundTransparency = 1
-	valid_text_label.Size = UDim2.new(1, 0, 0, 8)
+	valid_text_label.Size = UDim2.new(1, 0, 0, 15)
 	valid_text_label.Font = Enum.Font.PatrickHand
 	valid_text_label.Text = "ExampleText"
 	valid_text_label.TextColor3 = Color3.fromRGB(0, 0, 0)
