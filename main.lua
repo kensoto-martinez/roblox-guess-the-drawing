@@ -1,6 +1,7 @@
 local gui = game.Players.LocalPlayer.PlayerGui
 local word = gui:FindFirstChild("TheWord").Frame.word
 local confirmed_word = gui:FindFirstChild("guessList").Frame.word
+local list = loadstring(game:HttpGet("https://raw.githubusercontent.com/kensoto-martinez/roblox-guess-the-drawing/main/wordlist.lua"))()
 
 local extra_words = {}
 
@@ -114,7 +115,6 @@ end
 local function WordChanged()
 	local word_text = word.Text:lower()
 	local scrolling_frame = gui.GTD.Frame.Frame.ScrollingFrame
-	local list = loadstring(game:HttpGet("https://raw.githubusercontent.com/kensoto-martinez/roblox-guess-the-drawing/main/wordlist.lua"))()
 	local valid_word_added = false
 
 	local function MatchesWord(str: string)
@@ -163,14 +163,10 @@ local function WordChanged()
 	--if a valid word was not found, say so
 	if not valid_word_added then
 		AddWordLabel("No valid word found in current word bank.")
-		--add an event that checks for the confirmed word after the round ends, and add it to the extra array
-		confirmed_word_connection = confirmed_word:GetPropertyChangedSignal("Text"):Connect(function()
-			extra_words[#confirmed_word.Text] = confirmed_word.Text:lower()
-			confirmed_word_connection:Disconnect()
-		end)
 	end
 end
 
+--if both objects exist, initialize the ui
 if word and confirmed_word then
 	--initialize gui and start word logic event
 	CreateGui()
@@ -181,11 +177,36 @@ else
 	warn("Script error: game has either moved the location of the revealing word in the game or you accidentally changed the 'word' variable to an invalid location.")
 end
 
+--check if word is in bank, if not, add it to extra_words array
+confirmed_word_connection = confirmed_word:GetPropertyChangedSignal("Text"):Connect(function()
+	local word_in_bank = false
+
+	local function CheckList(lst: table)
+		if lst[#confirmed_word] then
+			for _, word_in_list in ipairs(lst[#confirmed_word]) do
+				if word_in_list == confirmed_word.Text:lower() then
+					word_in_bank = true
+					break
+				end
+			end
+		end
+	end
+
+	CheckList(list)
+	CheckList(extra_words)
+	
+	if not word_in_bank then
+		extra_words[#confirmed_word.Text] = confirmed_word.Text:lower()
+	end
+end)
+
 game.UserInputService.InputBegan:Connect(function(input, gp)
 	if gp then return end
 	if input.KeyCode == Enum.KeyCode.RightAlt and word_connection then
 		word_connection:Disconnect()
 		word_connection = nil
+		confirmed_word_connection:Disconnect()
+		confirmed_word_connection = nil
 		gui.GTD:Destroy()
 		game.ReplicatedStorage.ValidWordLabel:Destroy()
 	end
