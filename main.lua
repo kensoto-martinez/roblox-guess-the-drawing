@@ -101,7 +101,7 @@ local function CreateGui()
 	--valid text label
 	local valid_text_label = Instance.new("TextLabel")
 	valid_text_label.BackgroundTransparency = 1
-	valid_text_label.Size = UDim2.new(1, 0, 0, 15)
+	valid_text_label.Size = UDim2.new(1, 0, 0, 30)
 	valid_text_label.Font = Enum.Font.PatrickHand
 	valid_text_label.Text = "ExampleText"
 	valid_text_label.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -115,6 +115,7 @@ local function WordChanged()
 	local word_text = word.Text:lower()
 	local scrolling_frame = gui.GTD.Frame.Frame.ScrollingFrame
 	local list = loadstring(game:HttpGet("https://raw.githubusercontent.com/kensoto-martinez/roblox-guess-the-drawing/main/wordlist.lua"))()
+	local valid_word_added = false
 
 	local function MatchesWord(str: string)
 		for n = 1, #word_text do
@@ -136,11 +137,15 @@ local function WordChanged()
 		text_label.Parent = scrolling_frame
 	end
 
-	local function CheckMatchingWord(word_from_list: string)
-		if MatchesWord(word_from_list) then
-			--add valid word label if word matches with word_text
-			AddWordLabel(word_from_list)
-			valid_word_added = true
+	local function CheckMatchingWordFrom(list: table)
+		if list[#word_text] then
+			for _, word_from_list in ipairs(list[#word_text]) do
+				if MatchesWord(word_from_list) then
+					--add valid word label if word matches with word_text
+					AddWordLabel(word_from_list)
+					valid_word_added = true
+				end
+			end
 		end
 	end
 
@@ -151,19 +156,9 @@ local function WordChanged()
 		end
 	end
 
-	--make new valid word labels
-	local valid_word_added = false
-	if list[#word_text] then --don't make new labels for n-letter words that don't have an array
-		for _, word_from_list in ipairs(list[#word_text]) do
-			CheckMatchingWord(word_from_list)
-		end
-		--check alternate list as well
-		if extra_words[#word_text] then
-			for _, word_from_list in ipairs(extra_words[#word_text]) do
-				CheckMatchingWord(word_from_list)
-			end
-		end
-	end
+	--check for matching words and then create a label that corresponds to that matching word from the word bank
+	CheckMatchingWordFrom(list[#word_text])
+	CheckMatchingWordFrom(extra_words[#word_text])
 
 	--if a valid word was not found, say so
 	if not valid_word_added then
