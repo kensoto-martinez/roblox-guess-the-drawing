@@ -130,18 +130,18 @@ local function WordChanged()
 	    return true
 	end
 
+	local function AddWordLabel(word_label_text: string)
+		local text_label = game.ReplicatedStorage.ValidWordLabel:Clone()
+		text_label.Text = word_label_text
+		text_label.Parent = scrolling_frame
+	end
+
 	local function CheckMatchingWord(word_from_list: string)
 		if MatchesWord(word_from_list) then
 			--add valid word label if word matches with word_text
 			AddWordLabel(word_from_list)
 			valid_word_added = true
 		end
-	end
-
-	local function AddWordLabel(word_label_text: string)
-		local text_label = game.ReplicatedStorage.ValidWordLabel:Clone()
-		text_label.Text = word_label_text
-		text_label.Parent = scrolling_frame
 	end
 
 	--delete previous valid words
