@@ -1,6 +1,11 @@
 local gui = game.Players.LocalPlayer.PlayerGui
 local word = gui:FindFirstChild("TheWord").Frame.word
+local confirmed_word = gui:FindFirstChild("guessList").Frame.word
+
+local extra_words = {}
+
 local word_connection
+local confirmed_word_connection
 
 local function CreateGui()
 	local function CreateUICorner(obj: GuiObject)
@@ -125,6 +130,14 @@ local function WordChanged()
 	    return true
 	end
 
+	local function CheckMatchingWord(word_from_list: string)
+		if MatchesWord(word_from_list) then
+			--add valid word label if word matches with word_text
+			AddWordLabel(word_from_list)
+			valid_word_added = true
+		end
+	end
+
 	local function AddWordLabel(word_label_text: string)
 		local text_label = game.ReplicatedStorage.ValidWordLabel:Clone()
 		text_label.Text = word_label_text
@@ -142,21 +155,26 @@ local function WordChanged()
 	local valid_word_added = false
 	if list[#word_text] then --don't make new labels for n-letter words that don't have an array
 		for _, word_from_list in ipairs(list[#word_text]) do
-		    if MatchesWord(word_from_list) then
-				--add valid word label if word matches with word_text
-		        AddWordLabel(word_from_list)
-				valid_word_added = true
-		    end
+			CheckMatchingWord(word_from_list)
+		end
+		--check alternate list as well
+		for _, word_from_list in ipairs(extra_words[#word_text]) do
+			CheckMatchingWord(word_from_list)
 		end
 	end
 
 	--if a valid word was not found, say so
 	if not valid_word_added then
 		AddWordLabel("No valid word found in current word bank.")
+		--add an event that checks for the confirmed word after the round ends, and add it to the extra array
+		confirmed_word_connection = confirmed_word:GetPropertyChangedSignal("Text"):Connect(function()
+			extra_words[#confirmed_word.Text] = confirmed_word.Text:lower()
+			confirmed_word_connection:Disconnect()
+		end)
 	end
 end
 
-if word then
+if word and confirmed_word then
 	--initialize gui and start word logic event
 	CreateGui()
 	WordChanged()
