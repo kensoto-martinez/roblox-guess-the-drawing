@@ -138,8 +138,8 @@ local function WordChanged()
 	end
 
 	local function CheckMatchingWordFrom(lst: table)
-		if lst[#word_text] then
-			for _, word_from_list in ipairs(lst[#word_text]) do
+		if lst then
+			for _, word_from_list in ipairs(lst) do
 				if MatchesWord(word_from_list) then
 					--add valid word label if word matches with word_text
 					AddWordLabel(word_from_list)
